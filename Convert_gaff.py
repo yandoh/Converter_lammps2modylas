@@ -1,3 +1,7 @@
+#Copyright (c) 2022 Yoshimichi ANDOH
+#Released under the MIT license
+#https://opensource.org/licenses/mit-license.php
+
 #!/usr/bin/env python3
 import sys
 
