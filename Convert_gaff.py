@@ -166,7 +166,7 @@ typelno_to_typeid=[]
 for i in range(start_lno,end_lno):
   parts = read_data[i].split()
 # print(parts)
-  temp=(int(parts[0]),float(parts[1]))
+  temp=(int(parts[0]),float(parts[1]),parts[3])
   mass_list.append(temp)
   temp=(i-start_lno,int(parts[0]),parts[3])
   typelno_to_typeid.append(temp)
@@ -382,7 +382,8 @@ for i in range(0,end_lno):
     if i0==j0:
       value=temp2[1]
       break
-  f_mdff.write("    "+str(value)+"\n")
+# f_mdff.write("    "+str(value)+"\n")
+  f_mdff.write("    "+str(value)+" # "+str(temp2[2])+"\n")
 f_mdff.write("    </mass>\n")
 
 # epsilon

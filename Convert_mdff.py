@@ -262,7 +262,8 @@ end_lno  =line_id_mass_end
 mass_list=[]
 for i in range(start_lno,end_lno):
   parts = read_data[i].split()
-  temp  =(float(parts[0]))
+# temp  =(float(parts[0]))
+  temp  =(float(parts[0]),parts[2])
   mass_list.append(temp)
 new_mass_list=[]
 for i in range(0,len(mass_list)):
@@ -274,7 +275,8 @@ for oldid in range(0,len(mass_list)):
 f_mdff.write("    <mass>\n")
 for i in range(0,len(new_mass_list)):
   value=new_mass_list[i]
-  f_mdff.write("    "+str(value)+"\n")
+# f_mdff.write("    "+str(value)+"\n")
+  f_mdff.write("    "+str(value[0])+" # "+str(value[1])+"\n")
 f_mdff.write("    </mass>\n")
 
 ### input/output epsilon information ###
