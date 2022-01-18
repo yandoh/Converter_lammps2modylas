@@ -1,6 +1,6 @@
 # Converter_lammpls2modylas
-Converter from lammpls input to modylas input
+Converter from lammps input (*.data) to modylas input (.mdff, .mdxyz)
 
-This Pthon script enables users to convert from a LAMMPLS's .data file created by the Winmostor to .mdff and .mdxyz files to be read by the MODYLAS.
+This Pthon script enables users to convert from a LAMMPS's .data file created by the Winmostor to .mdff and .mdxyz files to be read by the MODYLAS.
 
 Use of Python 3 is presumed.
