@@ -23,13 +23,13 @@ Step 2) Convsertion from .mdff to .mdff.rearranged (also, .mdxyz to .mdxyz.rearr
 
 >python Convert_mdff.py sessionname.mdff   
 
-Note 1: This .mdff file is the resultant in step 1).
+`Note 1`: This .mdff file is the resultant in step 1).
 
-Note 2: The command is common regardless of distance constraints or not.
+`Note 2`: The command is common regardless of distance constraints or not.
 
 Then, sessionname.mdff.rearranged and sessionname.mdxyz.rearranged will be created.
 
-Note 3: In these .rearranged files, order of atoms is rearranged so that atom's in the same segment is serially packed in <segment> tags.
+`Note 3`: In these .rearranged files, order of atoms is rearranged so that atom's in the same segment is serially packed in <segment> tags.
 This is essential to run MD calcualion with distance constraints by modylas software. 
   
 Further, information files to be read by Fortran programs to analyze MD trajectories, managed by another repository "MD_analysis" will be automatically created.
