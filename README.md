@@ -10,18 +10,18 @@ About the Winmostar, see https://winmostar.com/jp/.
 ---
 Step 1) Convsertion from .data to .mdff and .mdxyz
 
->python3 sessionname.data 
+>python Convert_gaff.py sessionname.data 
 
 If distance constraints are introduced for X-H bonds, enter the following command,
 
->python3 sessionname.data shake
+>python Convert_gaff.py sessionname.data shake
 
 Then, sessionname.mdff and sessionname.mdxyz will be created.
 
 ---
 Step 2) Convsertion from .mdff to .mdff.rearranged (also, .mdxyz to .mdxyz.rearranged)
 
->python3 sessionname.mdff   
+>python Convert_mdff.py sessionname.mdff   
 
 Note 1: This .mdff file is the resultant in step 1).
 
@@ -31,3 +31,5 @@ Then, sessionname.mdff.rearranged and sessionname.mdxyz.rearranged will be creat
 
 Note 3: In these .rearranged files, order of atoms is rearranged so that atom's in the same segment is serially packed in <segment> tags.
 This is essential to run MD calcualion with distance constraints by modylas software. 
+  
+Further, information files to be read by Fortran programs to analyze MD trajectories, managed by another repository "MD_analysis" will be automatically created.
