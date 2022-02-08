@@ -100,6 +100,10 @@ print(nbond,nangle,ndihedral,nitorsion)
 print(nsegment)
   
 # parse line numbers
+line_id_system_start=0
+line_id_system_end=0
+line_id_species_start=0
+line_id_species_end=0
 line_id_mass_start=0
 line_id_mass_end=0
 line_id_eps_start=0
@@ -130,6 +134,14 @@ line_id_segment_end=0
 ### input mass ###
 for i in range(0,length_data):
   parts = read_data[i].split()
+  if "<system>" in parts:
+    line_id_system_start=i
+  if "</system>" in parts:
+    line_id_system_end=i
+  if "<species>" in parts:
+    line_id_species_start=i
+  if "</species>" in parts:
+    line_id_species_end=i
   if "<mass>" in parts:
     line_id_mass_start=i
   if "</mass>" in parts:
@@ -186,6 +198,7 @@ for i in range(0,length_data):
     line_id_segment_end=i
 
 ###debug
+#print(line_id_system_start,line_id_system_end)
 #print(line_id_mass_start,line_id_mass_end)
 #print(line_id_eps_start,line_id_eps_end)
 #print(line_id_r_start,line_id_r_end)
@@ -199,6 +212,7 @@ for i in range(0,length_data):
 #print(line_id_dihedral_start,line_id_dihedral_end)
 #print(line_id_improper_start,line_id_improper_end)
 #print(line_id_segment_start,line_id_segment_end)
+#sys.exit()
 
 ### input segments ###
 start_lno=line_id_segment_start
@@ -254,6 +268,33 @@ for i in range(0,line_id_mass_start):
 # print(line)
   f_mdff.write(line[0]+str("\n"))
 
+#sys.exit()
+
+### input system information ##
+start_lno=line_id_system_start+1
+end_lno  =line_id_system_end
+sysmol_list=[]
+for i in range(start_lno,end_lno):
+  parts = read_data[i].split()
+# temp  =(int(parts[0]),parts[1])
+  temp  =int(parts[1])
+  sysmol_list.append(temp)
+
+#print(sysmol_list)
+#sys.exit()
+
+### input species information ##
+#start_lno=line_id_species_start+1
+#end_lno=line_id_species_end
+start_lno=line_id_species_start+2
+end_lno=start_lno+1
+sysatom_list=[]
+for i in range(start_lno,end_lno):
+  parts = read_data[i].split("=")
+  temp  =int(parts[1])
+  sysatom_list.append(temp)
+
+#print(sysatom_list)
 #sys.exit()
 
 ### input/output masse information ###
@@ -700,3 +741,53 @@ for i in range(end_lno,length_data_xyz):
   f_mdxyz.write(line[0]+"\n")
   
 print("convert of .mdxyz ends.")
+
+
+
+#
+### open file for sys_info
+#
+f_sysinfo=open('sys_info','w')
+f_sysinfo.write(str(nspecies)+"\n")
+for i in range(0,nspecies):
+  f_sysinfo.write(str(sysatom_list[i])+"  "+str(sysmol_list[i])+"\n")
+f_sysinfo.close()
+print("./sys_info created.")
+
+#
+### open file for massinfo.mdff
+#
+f_massinfo=open('massinfo.mdff','w')
+
+f_massinfo.write("<mass>\n")
+for i in range(0,len(new_mass_list)):
+  value=new_mass_list[i]
+  f_massinfo.write("    "+str(value[0])+" # "+str(value[1])+"\n")
+f_massinfo.write("</mass>\n")
+
+f_massinfo.close()
+print("./massinfo created.")
+
+#
+### open file for seginfo.mdff
+#
+f_seginfo=open('seginfo.mdff','w')
+
+f_seginfo.write("    <segments>\n")
+f_seginfo.write("      "+str(nsegment)+"\n")
+idatom=0
+for i in range(0,nsegment):
+  natominsegment=natoms_in_segment[i]
+  f_seginfo.write("      <segment>\n")
+  f_seginfo.write("        "+str(i)+"\n")
+  f_seginfo.write("        "+str(natominsegment)+"\n")
+  f_seginfo.write("        <atom>\n")
+  for j in range(0,natominsegment):
+    f_seginfo.write("          "+str(idatom)+"\n")
+    idatom=idatom+1
+  f_seginfo.write("        </atom>\n")
+  f_seginfo.write("      </segment>\n")
+f_seginfo.write("    </segments>\n")
+
+f_seginfo.close()
+print("./seginfo created.")
