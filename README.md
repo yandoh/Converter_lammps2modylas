@@ -7,7 +7,7 @@ Use of Python 3 is presumed.
 
 About the Winmostar, see https://winmostar.com/jp/.
 
-
+---
 Step 1) Convsertion from .data to .mdff and .mdxyz
 
 >python3 sessionname.data 
@@ -18,7 +18,7 @@ If distance constraints are introduced for X-H bonds, enter the following comman
 
 Then, sessionname.mdff and sessionname.mdxyz will be created.
 
-
+---
 Step 2) Convsertion from .mdff to .mdff.rearranged (also, .mdxyz to .mdxyz.rearranged)
 
 >python3 sessionname.mdff   
