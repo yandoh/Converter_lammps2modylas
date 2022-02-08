@@ -748,6 +748,7 @@ print("convert of .mdxyz ends.")
 ### open file for sys_info
 #
 f_sysinfo=open('sys_info','w')
+f_sysinfo.write("species name \n")
 f_sysinfo.write(str(nspecies)+"\n")
 for i in range(0,nspecies):
   f_sysinfo.write(str(sysatom_list[i])+"  "+str(sysmol_list[i])+"\n")
