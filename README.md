@@ -7,6 +7,12 @@ Use of Python 3 is presumed.
 
 About the Winmostar, see https://winmostar.com/jp/.
 
+[IMPORTANT NOTICE]
+
+Present version of the script supports one-component system only.
+
+Multi-component system will be supported later.
+
 ---
 Step 1) Convsertion from .data to .mdff and .mdxyz
 
