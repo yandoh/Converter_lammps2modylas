@@ -1,4 +1,4 @@
-# Converter_lammpls2modylas
+# Converter_lammps2modylas
 Converter from lammps input (*.data) to modylas input (.mdff, .mdxyz)
 
 This Pthon script enables users to convert from a LAMMPS's .data file created by the Winmostar to .mdff and .mdxyz files to be read by the MODYLAS.
@@ -6,6 +6,12 @@ This Pthon script enables users to convert from a LAMMPS's .data file created by
 Use of Python 3 is presumed.
 
 About the Winmostar, see https://winmostar.com/jp/.
+
+[IMPORTANT NOTICE]
+
+Present version of the script supports one-component system only.
+
+Multi-component system will be supported later.
 
 ---
 Step 1) Convsertion from .data to .mdff and .mdxyz
