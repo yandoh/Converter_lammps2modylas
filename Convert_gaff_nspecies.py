@@ -323,6 +323,7 @@ atoms_in_each_mole.append(atoms_in_same_mole)
 ## count number of molecule species
 species_number=0
 molnumber_in_species=0
+atoms_in_each_species=[]
 molecules_in_each_species=[]
 for i in range(0,molnumber):
 #  hatom=hatom_in_each_mole[i]
@@ -339,15 +340,18 @@ for i in range(0,molnumber):
        molnumber_in_species=molnumber_in_species+1
        continue
      else:
+       atoms_in_each_species.append(natoms_per_mole0)
        molecules_in_each_species.append(molnumber_in_species)
 #      molecules_in_each_species[species_number]=1
        species_number=species_number+1
        molnumber_in_species=1
-   
+atoms_in_each_species.append(natoms_per_mole1)
 molecules_in_each_species.append(molnumber_in_species)
+
 print(species_number)
+print(atoms_in_each_species)
 print(molecules_in_each_species)
-sys.exit()
+#sys.exit()
 
 ### input Bonds information ###
 start_lno=line_id_bond+2
@@ -414,9 +418,13 @@ f_mdff.write("  special_divide_coulomb=1.2\n")
 f_mdff.write("</forcefield>\n")
 f_mdff.write("\n")
 f_mdff.write("<system>\n")
-f_mdff.write("  " +str(0)+" "+str(nmolecules)+"\n")
+for i in range(0,species_number):
+  f_mdff.write("  " +str(i)+" "+str(molecules_in_each_species[i])+"\n")
+#f_mdff.write("  " +str(0)+" "+str(nmolecules)+"\n")
 f_mdff.write("</system>\n")
 f_mdff.write("\n")
+
+sys.exit()
 
 ###
 ### output 2nd block in .mdff ###
