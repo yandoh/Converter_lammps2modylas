@@ -49,19 +49,17 @@ length_data=len(read_data)
 ### open file for output
 #
 f_mdff=open(sessionname+'.mdff.rearranged','w')
+f_mdxyz=open(sessionname+'.mdxyz.rearranged','w')
 
-# parse parameters
+#
+# parse parameters in .mdff
+#
 nspecies=0
 for i in range(0,length_data):
   parts = read_data[i].split("=")
   if "nspecies" in parts[0]:
     nspecies=int(parts[1])
-#   print(nspecies)
     break
-#if nspecies != 1:
-#  print("ERROR: nspecies != 1")
-#  sys.exit()
-
 
 nvoidpair_lj=[]
 nspecialpair_lj=[]
@@ -103,7 +101,9 @@ print(nbond,nangle,ndihedral,nitorsion)
 print(nsegment)
 #sys.exit()
   
-# parse line numbers
+#
+# parse line numbers in .mdff
+#
 line_id_system_start=0
 line_id_system_end=0
 line_id_nspecies=0
@@ -137,7 +137,9 @@ line_id_improper_end=[]
 line_id_segment_start=[]
 line_id_segment_end=[]
 
-### input line numbers ###
+#
+### input line numbers in .mdff ###
+#
 for i in range(0,length_data):
   parts = read_data[i].split()
 #
@@ -224,8 +226,37 @@ for i in range(0,length_data):
 #print(line_id_segment_start,line_id_segment_end)
 #sys.exit()
 
+
 #
-# Output header of .mdff
+# read original .mdxyz
+#
+filename=sessionname+".mdxyz"
+with open(filename, mode="r", encoding="utf-8") as fxyz:
+  read_data_xyz = list(fxyz)
+
+length_data_xyz=len(read_data_xyz)
+
+line_id_position_start=0
+line_id_position_end=0
+natomall=0
+for i in range(0,length_data_xyz):
+  parts = read_data_xyz[i].split()
+# print(parts)
+  if "natom" in parts[0]:
+    temp=parts[0].split("=")
+    natomall=int(temp[1])
+  if "<positions>" in parts:
+    line_id_position_start=i
+  if "</positions>" in parts:
+    line_id_position_end=i
+    break
+
+position_new=[]
+for i in range(0,natomall):
+  position_new.append(0)
+
+#
+# Output header of new .mdff
 #
 for i in range(0,line_id_nspecies+1):
   line=read_data[i].split("\n")
@@ -233,6 +264,13 @@ for i in range(0,line_id_nspecies+1):
   f_mdff.write(line[0]+str("\n"))
 #sys.exit()
 
+#
+# output header of new .mdxyz ###
+#
+start_lno=line_id_position_start+1
+for i in range(0,start_lno):
+  line=read_data_xyz[i].split("\n")
+  f_mdxyz.write(line[0]+"\n")
 
 #
 # input nmole (sys_info) #
@@ -262,6 +300,9 @@ for i in range(0,nspecies):
 print(sysmol_list)
 print(sysatom_list)
 
+hatom=0
+eatom=sysatom_list[0]*sysmol_list[0]
+print(hatom,eatom)
 #
 # record <species>
 #
@@ -654,11 +695,100 @@ for i in range(0,nspecies):
   f_mdff.write("    </segments>\n")
 #######
   f_mdff.write("  </species>\n")
-f_mdff.write("</topology and parameters>\n")
 
+######
+# xyz
+######
+# position_new=[]
+# for m in range(0,natomall):
+#   position_new.append(0)
+  start_lno=line_id_position_start+1
+  end_lno=line_id_position_end
+  idold=0
+  idmol=0
+# idatm=0
+  for m in range(start_lno,end_lno):
+    parts = read_data_xyz[m].split()
+    iacheck=m-start_lno
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    x=parts[0]
+    y=parts[1]
+    z=parts[2]
+#   idatm+=1
+    idoldmol=idold-idmol*sysatom_list[i] #natom
+    newidmol=id_old2new[idoldmol]
+    newid=newidmol+idmol*sysatom_list[i] +hatom #natom
+    position_new[newid]=[x,y,z]
+    idold=idold+1
+    if idoldmol==sysatom_list[i]-1:
+      idmol=idmol+1
+#
+  hatom=hatom+sysatom_list[i]*sysmol_list[i]
+  if i == nspecies - 1:
+    eatom=natomall
+  else:
+    eatom=eatom+sysatom_list[i+1]*sysmol_list[i+1]
+  print(hatom,eatom)
+
+#
+# end of .mdff convert
+#
+f_mdff.write("</topology and parameters>\n")
 print("convert of .mdff ends.")
 
+print(len(position_new))
+for i in range(0,natomall):
+  xyz=position_new[i]
+  x=xyz[0]
+  y=xyz[1]
+  z=xyz[2]
+  f_mdxyz.write("  "+x+" "+y+" "+z+"\n")
+for i in range(end_lno,length_data_xyz):
+  line=read_data_xyz[i].split("\n")
+  f_mdxyz.write(line[0]+"\n")
+
+print("convert of .mdxyz ends.")
+
 sys.exit()
+
+
+#
+### open file for output
+#
+#f_mdxyz=open(sessionname+'.mdxyz.rearranged','w')
+
+#
+# read old .mdxyz
+#
+#filename=sessionname+".mdxyz"
+#with open(filename, mode="r", encoding="utf-8") as fxyz:
+#  read_data_xyz = list(fxyz)
+
+#length_data_xyz=len(read_data_xyz)
+
+#line_id_position_start=0
+#line_id_position_end=0
+#natomall=0
+#for i in range(0,length_data_xyz):
+#  parts = read_data_xyz[i].split()
+## print(parts)
+#  if "natom" in parts[0]:
+#    temp=parts[0].split("=")
+#    natomall=int(temp[1])
+#  if "<positions>" in parts:
+#    line_id_position_start=i
+#  if "</positions>" in parts:
+#    line_id_position_end=i
+#    break
+
+position_new=[]
+for i in range(0,natomall):
+  position_new.append(0)
+
+sys.exit()
+
+
 
 ### input segments ###
 natoms_in_segment=[]
