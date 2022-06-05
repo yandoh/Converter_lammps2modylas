@@ -353,11 +353,12 @@ for i in range(0,molnumber):
 atoms_in_each_species.append(natoms_per_mole1)
 molecules_in_each_species.append(molnumber_in_species)
 
-print("nspecies=",species_number)
-print("nav=",atoms_in_each_species)
-print("nmv=",molecules_in_each_species)
-for i in range(0,len(global_hatom_in_each_species)):
-  print(i,global_hatom_in_each_species[i],atoms_in_each_species[i])
+#debug
+#print("nspecies=",species_number)
+#print("nav=",atoms_in_each_species)
+#print("nmv=",molecules_in_each_species)
+#for i in range(0,len(global_hatom_in_each_species)):
+#  print(i,global_hatom_in_each_species[i],atoms_in_each_species[i])
 #sys.exit()
 
 ### input Bonds information ###
@@ -371,6 +372,7 @@ for i in range(start_lno,end_lno):
   bonds_list.append(temp)
   
 #print(bonds_list)
+print("len(bonds_list)=",len(bonds_list))
 
 
 ### input Angles information ###
@@ -516,8 +518,8 @@ for i in range(0,species_number):
   hatom=global_hatom_in_each_species[i]
   eatom=global_hatom_in_each_species[i]+atoms_in_each_species[i]
 # print("hatm,eatom=",hatom,eatom)
-  for i in range(0,end_lno):
-    temp=bonds_list[i]
+  for m in range(0,end_lno):
+    temp=bonds_list[m]
     iacheck=temp[1]+hatom-1
     jacheck=temp[2]+hatom-1
     if iacheck < hatom or iacheck >= eatom:
@@ -529,6 +531,21 @@ for i in range(0,species_number):
     ja=temp[2]-1
     f_mdff.write("     "+str(ia)+" "+str(ja)+"\n")
     nvoid+=1
+#
+  end_lno=len(angles_list)
+  for m in range(0,end_lno):
+    temp=angles_list[m]
+    iacheck=temp[1]+hatom-1
+    kacheck=temp[3]+hatom-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    ia=temp[1]-1
+    ka=temp[3]-1
+    f_mdff.write("     "+str(ia)+" "+str(ka)+"\n")
+    nvoid+=1
+#
   f_mdff.write("    </lj void pair>\n")
   f_mdff.write("    nvoidpair_lj ="+str(nvoid)+"\n")
 ##################
@@ -540,8 +557,337 @@ for i in range(0,species_number):
 ####################
 # coulomb void pair
 ####################
+  nvoid=0
+  f_mdff.write("    <coulomb void pair>\n")
+  hatom=global_hatom_in_each_species[i]
+  eatom=global_hatom_in_each_species[i]+atoms_in_each_species[i]
+# print("hatm,eatom=",hatom,eatom)
+  end_lno=len(bonds_list)
+  for m in range(0,end_lno):
+    temp=bonds_list[m]
+    iacheck=temp[1]+hatom-1
+    jacheck=temp[2]+hatom-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+#   print("iacheck,jacheck=",iacheck,jacheck)
+    ia=temp[1]-1
+    ja=temp[2]-1
+    f_mdff.write("     "+str(ia)+" "+str(ja)+"\n")
+    nvoid+=1
+#
+  end_lno=len(angles_list)
+  for m in range(0,end_lno):
+    temp=angles_list[m]
+    iacheck=temp[1]+hatom-1
+    kacheck=temp[3]+hatom-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    ia=temp[1]-1
+    ka=temp[3]-1
+    f_mdff.write("     "+str(ia)+" "+str(ka)+"\n")
+    nvoid+=1
+#
+  f_mdff.write("    </coulomb void pair>\n")
+  f_mdff.write("    nvoidpair_coulomb ="+str(nvoid)+"\n")
+#############
+# shake pair
+#############
+  shake_on_list=[]
+  shake_off_list=[]
+  nshake_on=0
+  nshake_off=0
+  hatom=global_hatom_in_each_species[i]
+  eatom=global_hatom_in_each_species[i]+atoms_in_each_species[i]
+# print("hatom,eatom=",hatom,eatom)
+  end_lno=len(bonds_list)
+  for m in range(0,end_lno):
+    temp=bonds_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+#   iacheck=temp[1]+hatom-1
+#   jacheck=temp[2]+hatom-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    btype=temp[0]-1
+    ia=temp[1]-1
+    ja=temp[2]-1
+    tempbond=bondcoef_list[btype]
+    kbond=tempbond[1] ## K_bond
+    lbond=tempbond[2] ## b0
+#   tempi=atomid_to_typeid[ia+hatom]
+#   tempj=atomid_to_typeid[ja+hatom]
+    tempi=atomid_to_typeid[ia]
+    tempj=atomid_to_typeid[ja]
+    itype=tempi[1]-1
+    jtype=tempj[1]-1
+#
+    tempi=typeid_to_typelno[itype]
+    tempj=typeid_to_typelno[jtype]
+    iatomname=tempi[2]
+    jatomname=tempj[2]
+#   print(i,m,iatomname,jatomname)
+    temp=(int(ia),int(ja),float(kbond),float(lbond),iatomname,jatomname)
+#
+    hxbond=0
+    if iatomname.startswith("h"):
+      hxbond=1
+    elif jatomname.startswith("h"):
+      hxbond=1
+    elif iatomname.startswith("H"):
+      hxbond=1
+    elif jatomname.startswith("H"):
+      hxbond=1
 
-####################
+    if hxbond==1:
+      shake_on_list.append(temp)
+      nshake_on+=1
+    else:
+      shake_off_list.append(temp)
+      nshake_off+=1
+
+# print(nshake_on,nshake_off)
+# print(i,shake_on_list)
+# print(i,shake_off_list)
+
+  end_lno=int(atoms_in_each_species[i])
+  flg=[]
+  for m in range(0,end_lno):
+    flg.append(0)
+  shake_group_global=[]
+  shake_group_local=[]
+  for m in range(0,end_lno):
+    if flg[m]==1:
+      continue
+    shake_group_local.append(m)
+    flg[m]==1
+    for j in range(0,nshake_on):
+      temp=shake_on_list[j]
+      ia=temp[0]-hatom
+      ja=temp[1]-hatom
+      if ia==m:
+        shake_group_local.append(ja)
+        flg[ja]=1
+    shake_group_global.append(shake_group_local)
+    shake_group_local=[]
+  nshakegroup=len(shake_group_global)
+#
+  print(nshakegroup)
+  print(shake_group_global)
+# print("nshake_on,nshake_off=",nshake_on,nshake_off)
+# print(len(shake_on_list),len(shake_off_list))
+# sys.exit()
+
+  if shake_switch == 1:
+  # <shake>
+    f_mdff.write("    <shake pair>\n")
+    for m in range(0,nshake_on):
+      temp=shake_on_list[m]
+      ia=temp[0]-hatom
+      ja=temp[1]-hatom
+      f_mdff.write("     "+str(ia)+" "+str(ja)                 +" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+#     f_mdff.write("     "+str(temp[0])+" "+str(temp[1])                 +" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+    f_mdff.write("    </shake pair>\n")
+  # <bond>
+    f_mdff.write("    nbond="+str(nshake_off)+"\n")
+    f_mdff.write("    <bond>\n")
+    for m in range(0,nshake_off):
+      temp=shake_off_list[m]
+      ia=temp[0]-hatom
+      ja=temp[1]-hatom
+      f_mdff.write("     "+str(ia)+" "+str(ja)+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+#     f_mdff.write("     "+str(temp[0])+" "+str(temp[1])+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+    f_mdff.write("    </bond>\n")
+  else:
+  # <shake> (empty)
+    f_mdff.write("    <shake pair>\n")
+    f_mdff.write("    </shake pair>\n")
+  # <bond>
+#   end_lno=int(atoms_in_each_species[i])
+#   f_mdff.write("    nbond="+str(end_lno)+"\n")
+    f_mdff.write("    nbond="+str(nshake_on+nshake_off)+"\n")
+    f_mdff.write("    <bond>\n")
+#   for m in range(0,end_lno):
+#     temp=bonds_list[m]
+#     btype=temp[0]-1
+#     ia=temp[1]-1 #-hatom
+#     ja=temp[2]-1 #-hatom
+#     temp=bondcoef_list[btype]
+#     kbond=temp[1]
+#     lbond=temp[2]
+#     f_mdff.write("     "+str(ia)+" "+str(ja)+" "+str(kbond)+" "+str(lbond)+"\n")
+    for m in range(0,nshake_on):
+      temp=shake_on_list[m]
+      ia=temp[0]-hatom
+      ja=temp[1]-hatom
+      f_mdff.write("     "+str(ia)+" "+str(ja)+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+#     f_mdff.write("     "+str(temp[0])+" "+str(temp[1])+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+    for m in range(0,nshake_off):
+      temp=shake_off_list[m]
+      ia=temp[0]-hatom
+      ja=temp[1]-hatom
+      f_mdff.write("     "+str(ia)+" "+str(ja)+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+#     f_mdff.write("     "+str(temp[0])+" "+str(temp[1])+" "+str(temp[2])+" "+str(temp[3])+" # "+str(temp[4])+" "+str(temp[5])+"\n")
+    f_mdff.write("    </bond>\n")
+########
+# angle
+########
+  nangles_in_each_species=0
+  end_lno=len(angles_list)
+  for m in range(0,end_lno):
+    temp=angles_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    nangles_in_each_species+=1
+#
+  f_mdff.write("    nangle="+str(nangles_in_each_species)+"\n")
+  f_mdff.write("    <angle>\n")
+  for m in range(0,end_lno):
+    temp=angles_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    btype=temp[0]-1
+    ia=temp[1]-1
+    ja=temp[2]-1
+    ka=temp[3]-1
+    temp=anglecoef_list[btype]
+    kangle=temp[1]
+    langle=temp[2]
+    f_mdff.write("     "+str(ia-hatom)+" "+str(ja-hatom)+" "+str(ka-hatom)+" "+str(kangle)+" "+str(langle)+"\n")
+  f_mdff.write("    </angle>\n")
+############
+# dihedrals 
+############
+  ndihedrals_in_each_species=0
+  end_lno=len(dihedrals_list)
+  for m in range(0,end_lno):
+    temp=dihedrals_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    lacheck=temp[4]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    if lacheck < hatom or lacheck >= eatom:
+      continue
+    ndihedrals_in_each_species+=1
+
+  f_mdff.write("    ndihedral="+str(ndihedrals_in_each_species)+"\n")
+  f_mdff.write("    <dihedral>\n")
+  for m in range(0,end_lno):
+    temp=dihedrals_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    lacheck=temp[4]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    if lacheck < hatom or lacheck >= eatom:
+      continue
+    btype=temp[0]-1
+    ia=temp[1]-1
+    ja=temp[2]-1
+    ka=temp[3]-1
+    la=temp[4]-1
+    temp=dihedcoef_list[btype]
+    kdihed=temp[1]
+    ndihed=temp[2]
+    pdihed=temp[3]
+    f_mdff.write("     "+str(ia-hatom)+" "+str(ja-hatom)+" "+str(ka-hatom)+" "+str(la-hatom)+" "+str(kdihed)+" "+str(ndihed)+" "+str(pdihed)+"\n")
+  f_mdff.write("    </dihedral>\n")
+###################
+# improper torsion
+###################
+  nimpropers_in_each_species=0
+  end_lno=len(impropers_list)
+  for m in range(0,end_lno):
+    temp=impropers_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    lacheck=temp[4]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    if lacheck < hatom or lacheck >= eatom:
+      continue
+    nimpropers_in_each_species+=1
+
+  f_mdff.write("    nitorsion="+str(nimpropers_in_each_species)+"\n")
+  f_mdff.write("    <itorsion>\n")
+  for m in range(0,end_lno):
+    temp=impropers_list[m]
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+    kacheck=temp[3]-1
+    lacheck=temp[4]-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+    if kacheck < hatom or kacheck >= eatom:
+      continue
+    if lacheck < hatom or lacheck >= eatom:
+      continue
+    btype=temp[0]-1
+    ia=temp[1]-1
+    ja=temp[2]-1
+    ka=temp[3]-1
+    la=temp[4]-1
+    temp=impropercoef_list[btype]
+    kimprp=temp[1]
+    dimprp=temp[2]
+    nimprp=temp[3]
+    f_mdff.write("     "+str(ia-hatom)+" "+str(ja-hatom)+" "+str(ka-hatom)+" "+str(la-hatom)+" "+str(kimprp)+" "+str(dimprp)+" "+str(nimprp)+"\n")
+  f_mdff.write("    </itorsion>\n")
+###########
+# segments
+###########
+  f_mdff.write("    <segments>\n")
+  f_mdff.write("      nsegment= "+str(nshakegroup)+"\n")
+  for m in range(0,nshakegroup):
+    temp=shake_group_global[m]
+    natoms_in_segment=len(temp)
+    f_mdff.write("      <segment>\n")
+    f_mdff.write("        ID= "+str(m)+"\n")
+    f_mdff.write("        natom="+str(natoms_in_segment)+"\n")
+    f_mdff.write("        <atom>\n")
+    for j in range(0,natoms_in_segment):
+      f_mdff.write("           "+str(temp[j])+"\n")
+    f_mdff.write("        </atom>\n")
+    f_mdff.write("      </segment>\n")
+  f_mdff.write("    </segments>\n")
+#
   f_mdff.write("  </species>\n")
 
 f_mdff.write("</topology and parameters>\n")
