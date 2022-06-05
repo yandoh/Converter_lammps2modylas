@@ -325,8 +325,10 @@ species_number=0
 molnumber_in_species=0
 atoms_in_each_species=[]
 molecules_in_each_species=[]
+#
+global_hatom_in_each_species=[0]
 for i in range(0,molnumber):
-#  hatom=hatom_in_each_mole[i]
+   hatom=hatom_in_each_mole[i]
    natoms_per_mole1=atoms_in_each_mole[i]
 #  print(hatom,natoms_per_mole1)
    if species_number == 0:
@@ -335,22 +337,27 @@ for i in range(0,molnumber):
      continue
    else:
      natoms_per_mole0=atoms_in_each_mole[i-1]
+     hatom0=hatom_in_each_mole[i-1]
 #    print(i,natoms_per_mole0,natoms_per_mole1)
-     if natoms_per_mole0 == natoms_per_mole1:
+     if natoms_per_mole0 == natoms_per_mole1:  ## same species
        molnumber_in_species=molnumber_in_species+1
        continue
-     else:
+     else:   ## different species
        atoms_in_each_species.append(natoms_per_mole0)
        molecules_in_each_species.append(molnumber_in_species)
+#      print("hatom,hatom0=",hatom,hatom0)
+       global_hatom_in_each_species.append(hatom)
 #      molecules_in_each_species[species_number]=1
        species_number=species_number+1
        molnumber_in_species=1
 atoms_in_each_species.append(natoms_per_mole1)
 molecules_in_each_species.append(molnumber_in_species)
 
-print(species_number)
-print(atoms_in_each_species)
-print(molecules_in_each_species)
+print("nspecies=",species_number)
+print("nav=",atoms_in_each_species)
+print("nmv=",molecules_in_each_species)
+for i in range(0,len(global_hatom_in_each_species)):
+  print(i,global_hatom_in_each_species[i],atoms_in_each_species[i])
 #sys.exit()
 
 ### input Bonds information ###
@@ -424,7 +431,7 @@ for i in range(0,species_number):
 f_mdff.write("</system>\n")
 f_mdff.write("\n")
 
-sys.exit()
+#sys.exit()
 
 ###
 ### output 2nd block in .mdff ###
@@ -432,10 +439,118 @@ sys.exit()
 natoms_per_mole=int(int(natoms)/int(nmolecules))
 
 f_mdff.write("<topology and parameters>\n")
-f_mdff.write(" nspecies = 1\n")
-f_mdff.write("  <species>\n")
-f_mdff.write("    id = 0\n")
-f_mdff.write("    natom ="+str(natoms_per_mole)+"\n")
+f_mdff.write(" nspecies ="+str(species_number)+"\n")
+#f_mdff.write(" nspecies = 1\n")
+
+for i in range(0,species_number):
+  f_mdff.write("  <species>\n")
+  f_mdff.write("    id ="+str(i)+"\n")
+# f_mdff.write("    id = 0\n")
+  f_mdff.write("    natom ="+str(atoms_in_each_species[i])+"\n")
+# f_mdff.write("    natom ="+str(natoms_per_mole)+"\n")
+#####
+#mass
+#####
+  f_mdff.write("    <mass>\n")
+  for j in range(0,atoms_in_each_species[i]):
+    hatom=global_hatom_in_each_species[i]
+    atomid=hatom+j
+    temp=atomid_to_typeid[atomid]
+    typeid=temp[1]
+    for k in range(0,len(mass_list)):
+      temp2=mass_list[k]
+      if(typeid==temp2[0]):
+        value=temp2[1]
+        break
+    f_mdff.write("    "+str(value)+" # "+str(temp2[2])+"\n")
+  f_mdff.write("    </mass>\n")
+########
+#epsilon
+########
+  f_mdff.write("    <epsilon>\n")
+  for j in range(0,atoms_in_each_species[i]):
+    hatom=global_hatom_in_each_species[i]
+    atomid=hatom+j
+    temp=atomid_to_typeid[atomid]
+    typeid=temp[1]
+    for k in range(0,len(paircoef_list)):
+      temp2=paircoef_list[k]
+      if(typeid==temp2[0]):
+        value=temp2[1]
+        break
+    f_mdff.write("    "+str(value)+"\n")
+  f_mdff.write("    </epsilon>\n")
+####
+# r
+####
+  f_mdff.write("    <r>\n")
+  for j in range(0,atoms_in_each_species[i]):
+    hatom=global_hatom_in_each_species[i]
+    atomid=hatom+j
+    temp=atomid_to_typeid[atomid]
+    typeid=temp[1]
+    for k in range(0,len(paircoef_list)):
+      temp2=paircoef_list[k]
+      if(typeid==temp2[0]):
+        value=temp2[2]
+        break
+    f_mdff.write("    "+str(value)+"\n")
+  f_mdff.write("    </r>\n")
+#########
+# charge
+#########
+  f_mdff.write("    <charge>\n")
+  for j in range(0,atoms_in_each_species[i]):
+    hatom=global_hatom_in_each_species[i]
+    atomid=hatom+j
+    temp=charge_list[atomid]
+    value=temp[1]
+    f_mdff.write("    "+str(value)+"\n")
+  f_mdff.write("    </charge>\n")
+###############
+# lj void pair
+###############
+  nvoid=0
+  f_mdff.write("    <lj void pair>\n")
+  end_lno=len(bonds_list)
+  hatom=global_hatom_in_each_species[i]
+  eatom=global_hatom_in_each_species[i]+atoms_in_each_species[i]
+# print("hatm,eatom=",hatom,eatom)
+  for i in range(0,end_lno):
+    temp=bonds_list[i]
+    iacheck=temp[1]+hatom-1
+    jacheck=temp[2]+hatom-1
+    if iacheck < hatom or iacheck >= eatom:
+      continue
+    if jacheck < hatom or jacheck >= eatom:
+      continue
+#   print("iacheck,jacheck=",iacheck,jacheck)
+    ia=temp[1]-1
+    ja=temp[2]-1
+    f_mdff.write("     "+str(ia)+" "+str(ja)+"\n")
+    nvoid+=1
+  f_mdff.write("    </lj void pair>\n")
+  f_mdff.write("    nvoidpair_lj ="+str(nvoid)+"\n")
+##################
+# lj special pair
+##################
+  f_mdff.write("    <lj special pair>\n")
+  f_mdff.write("    </lj special pair>\n")
+  f_mdff.write("    nspecialpair_lj =0\n")
+####################
+# coulomb void pair
+####################
+
+####################
+  f_mdff.write("  </species>\n")
+
+f_mdff.write("</topology and parameters>\n")
+sys.exit()
+
+
+
+
+
 
 
 # mass
