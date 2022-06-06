@@ -518,31 +518,38 @@ for i in range(0,species_number):
   hatom=global_hatom_in_each_species[i]
   eatom=global_hatom_in_each_species[i]+atoms_in_each_species[i]
 # print("hatm,eatom=",hatom,eatom)
+# print("bonds_list=",len(bonds_list))
   for m in range(0,end_lno):
     temp=bonds_list[m]
-    iacheck=temp[1]+hatom-1
-    jacheck=temp[2]+hatom-1
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+#   iacheck=temp[1]+hatom-1
+#   jacheck=temp[2]+hatom-1
     if iacheck < hatom or iacheck >= eatom:
       continue
     if jacheck < hatom or jacheck >= eatom:
       continue
 #   print("iacheck,jacheck=",iacheck,jacheck)
-    ia=temp[1]-1
-    ja=temp[2]-1
+    ia=temp[1]-1 -hatom
+    ja=temp[2]-1 -hatom
     f_mdff.write("     "+str(ia)+" "+str(ja)+"\n")
     nvoid+=1
 #
+# print("angles_list=",len(angles_list))
   end_lno=len(angles_list)
   for m in range(0,end_lno):
     temp=angles_list[m]
-    iacheck=temp[1]+hatom-1
-    kacheck=temp[3]+hatom-1
+    iacheck=temp[1]-1
+    kacheck=temp[3]-1
+#   iacheck=temp[1]+hatom-1
+#   kacheck=temp[3]+hatom-1
     if iacheck < hatom or iacheck >= eatom:
       continue
     if kacheck < hatom or kacheck >= eatom:
       continue
-    ia=temp[1]-1
-    ka=temp[3]-1
+#   print("iacheck,kacheck=",iacheck,kacheck)
+    ia=temp[1]-1 -hatom
+    ka=temp[3]-1 -hatom
     f_mdff.write("     "+str(ia)+" "+str(ka)+"\n")
     nvoid+=1
 #
@@ -565,29 +572,33 @@ for i in range(0,species_number):
   end_lno=len(bonds_list)
   for m in range(0,end_lno):
     temp=bonds_list[m]
-    iacheck=temp[1]+hatom-1
-    jacheck=temp[2]+hatom-1
+    iacheck=temp[1]-1
+    jacheck=temp[2]-1
+#   iacheck=temp[1]+hatom-1
+#   jacheck=temp[2]+hatom-1
     if iacheck < hatom or iacheck >= eatom:
       continue
     if jacheck < hatom or jacheck >= eatom:
       continue
 #   print("iacheck,jacheck=",iacheck,jacheck)
-    ia=temp[1]-1
-    ja=temp[2]-1
+    ia=temp[1]-1 -hatom
+    ja=temp[2]-1 -hatom
     f_mdff.write("     "+str(ia)+" "+str(ja)+"\n")
     nvoid+=1
 #
   end_lno=len(angles_list)
   for m in range(0,end_lno):
     temp=angles_list[m]
-    iacheck=temp[1]+hatom-1
-    kacheck=temp[3]+hatom-1
+    iacheck=temp[1]-1
+    kacheck=temp[3]-1
+#   iacheck=temp[1]+hatom-1
+#   kacheck=temp[3]+hatom-1
     if iacheck < hatom or iacheck >= eatom:
       continue
     if kacheck < hatom or kacheck >= eatom:
       continue
-    ia=temp[1]-1
-    ka=temp[3]-1
+    ia=temp[1]-1 -hatom
+    ka=temp[3]-1 -hatom
     f_mdff.write("     "+str(ia)+" "+str(ka)+"\n")
     nvoid+=1
 #
