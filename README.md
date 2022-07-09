@@ -16,18 +16,18 @@ Multi-component system will be supported later.
 ---
 Step 1) Convsertion from .data to .mdff and .mdxyz
 
->python Convert_gaff.py sessionname.data 
+>python Convert_gaff_nspecies.py sessionname.data 
 
 If distance constraints are introduced for X-H bonds, enter the following command,
 
->python Convert_gaff.py sessionname.data shake
+>python Convert_gaff_nspecies.py sessionname.data shake
 
 Then, sessionname.mdff and sessionname.mdxyz will be created.
 
 ---
 Step 2) Convsertion from .mdff to .mdff.rearranged (also, .mdxyz to .mdxyz.rearranged)
 
->python Convert_mdff.py sessionname.mdff   
+>python Convert_mdff_nspecies.py sessionname.mdff   
 
 `Note 1`: This .mdff file is the resultant in step 1).
 
