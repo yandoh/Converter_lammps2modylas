@@ -278,7 +278,7 @@ for i in range(start_lno,end_lno):
   temp=(float(parts[4]),float(parts[5]),float(parts[6]))
   xyz_list.append(temp)
 #(4) molid
-  temp=(int(parts[0]),int(parts[1]))
+  temp=(int(parts[0]),int(parts[1]),int(parts[2]),float(parts[3]))
   molid_list.append(temp)
   
 ## note: this eq. is correct for one-component system only! ##
@@ -293,32 +293,56 @@ nmolecules=parts[1]
 natomlines=len(molid_list)
 #print(natomlines)
 atoms_in_same_mole=0
+#atom_ids_list=[]
+charge_list_in_mole=[]
 molnumber=1
 atoms_in_each_mole=[]
 hatom_in_each_mole=[]
+#atomids_in_each_mole=[]
+charges_in_each_mole=[]
 for i in range(0,natomlines):
   temp1=molid_list[i]
   molid1=temp1[1]
+# atmid1=temp1[2]
+  charge1=temp1[3]
   if atoms_in_same_mole == 0:
     atoms_in_same_mole = 1
     hatom_in_each_mole.append(0)
+#   atom_ids_list.append(atmid1)
+    charge_list_in_mole.append(charge1)
     continue
   else:
     temp0=molid_list[i-1]
     molid0=temp0[1]
+#   atmid0=temp0[2]
 #   print(i,i-1,molid0,molid1)
+    charge0=temp0[3]
     if molid0 == molid1:
       atoms_in_same_mole = atoms_in_same_mole + 1
+#     atom_ids_list.append(atmid1)
+      charge_list_in_mole.append(charge1)
     else:
       atoms_in_each_mole.append(atoms_in_same_mole)
+#     atomids_in_each_mole.append(atom_ids_list)
+      charges_in_each_mole.append(charge_list_in_mole)
       molnumber = molnumber + 1
       atoms_in_same_mole = 1
+#     atom_ids_list=[]
+      charge_list_in_mole=[charge1]
       hatom_in_each_mole.append(i)
 atoms_in_each_mole.append(atoms_in_same_mole)
+#atomids_in_each_mole.append(atom_ids_list)
+charges_in_each_mole.append(charge_list_in_mole)
 
 #print(molnumber)
 #print(atoms_in_each_mole)
 #print(hatom_in_each_mole)
+#
+#print(len(charges_in_each_mole))
+#for i in range(0,len(charges_in_each_mole)):
+#  temp=charges_in_each_mole[i]
+#  print(i,temp)
+#sys.exit()
 
 ## count number of molecule species
 species_number=0
@@ -330,6 +354,7 @@ global_hatom_in_each_species=[0]
 for i in range(0,molnumber):
    hatom=hatom_in_each_mole[i]
    natoms_per_mole1=atoms_in_each_mole[i]
+   charges_list1=charges_in_each_mole[i]
 #  print(hatom,natoms_per_mole1)
    if species_number == 0:
      species_number = 1
@@ -337,9 +362,11 @@ for i in range(0,molnumber):
      continue
    else:
      natoms_per_mole0=atoms_in_each_mole[i-1]
+     charges_list0=charges_in_each_mole[i-1]
      hatom0=hatom_in_each_mole[i-1]
 #    print(i,natoms_per_mole0,natoms_per_mole1)
-     if natoms_per_mole0 == natoms_per_mole1:  ## same species
+#    if natoms_per_mole0 == natoms_per_mole1:  ## same species
+     if charges_list0 == charges_list1:  ## same species
        molnumber_in_species=molnumber_in_species+1
        continue
      else:   ## different species
