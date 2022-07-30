@@ -1,22 +1,26 @@
 # This document describes how to convert *.data file created by 
 # the Winmostar into .mdff and .mdxyz files readable by modylas program.
+#
+# Note: Convert_gaff_nspecies.py and Convert_mdff_nspecies.py are new scripts
+#       generalized for a n-component system (n=1,2,3,...).
 
 Case (1): without shake condition
 
-python ../Convert_gaff.py butane_1400.data
+python ../Convert_gaff_nspecies.py butane_1400.data
 => butane_1400.mdff and butane_1400.mdxyz will be generated.
 
-python ../Convert_mdff.py butane_1400.mdff
+python ../Convert_mdff_nspecies.py butane_1400.mdff
 => butane_1400.mdff.rearranged and butane_1400.mdxyz.rearranged will be generaged.
 
 
 Case (2): with shake condition for X-H bonds
 
-python ../Convert_gaff.py butane_1400.data shake
+python ../Convert_gaff_nspecies.py butane_1400.data shake
 => butane_1400.mdff and butane_1400.mdxyz will be generated.
 
-python ../Convert_mdff.py butane_1400.mdff
+python ../Convert_mdff_nspecies.py butane_1400.mdff
 => butane_1400.mdff.rearranged and butane_1400.mdxyz.rearranged will be generaged.
 
 
-For both (1) and (2) cases, in butane_1400.mdff.rearranged and butane_1400.mdxyz.rearranged, order of atoms is rearraged so that shake pairs relevant to the same heavy atoms are closed with a segment.
+For both (1) and (2) cases, in butane_1400.mdff.rearranged and butane_1400.mdxyz.rearranged, 
+order of atoms is rearraged so that shake pairs relevant to the same heavy atoms are closed with a segment.
